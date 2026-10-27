@@ -1,0 +1,227 @@
+
+.admin-dashboard {
+  min-height: 100vh;
+  padding: 40px 20px;
+  background: #f8fafc;
+  color: #05192e;
+  font-family: Arial, sans-serif;
+  box-sizing: border-box;
+}
+
+.admin-dashboard * {
+  box-sizing: border-box;
+}
+
+.admin-dashboard .admin-header {
+  max-width: 1100px;
+  margin: 0 auto 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.admin-dashboard .admin-eyebrow {
+  color: #a77b20;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+.admin-dashboard h1 {
+  margin: 8px 0;
+  color: #05192e;
+  font-size: 34px;
+}
+
+.admin-dashboard h2 {
+  margin-top: 0;
+  color: #05192e;
+}
+
+.admin-dashboard p {
+  color: #64748b;
+  line-height: 1.6;
+}
+
+.admin-dashboard .admin-panel {
+  max-width: 1100px;
+  margin: 24px auto;
+  padding: 28px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  box-shadow: 0 8px 25px rgba(5, 25, 46, 0.06);
+}
+
+.admin-dashboard .admin-login {
+  max-width: 450px;
+  margin: 50px auto;
+  padding: 35px;
+}
+
+.admin-dashboard form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.admin-dashboard label {
+  margin-top: 8px;
+  color: #05192e;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.admin-dashboard input,
+.admin-dashboard textarea,
+.admin-dashboard select {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 7px;
+  background: #fff;
+  color: #05192e;
+  font: inherit;
+  outline: none;
+}
+
+.admin-dashboard input:focus,
+.admin-dashboard textarea:focus,
+.admin-dashboard select:focus {
+  border-color: #d4af37;
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
+}
+
+.admin-dashboard button {
+  padding: 12px 18px;
+  border: none;
+  border-radius: 7px;
+  background: #05192e;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.admin-dashboard button:hover {
+  background: #12395c;
+}
+
+.admin-dashboard button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.admin-dashboard .admin-login button[type="submit"],
+.admin-dashboard .admin-panel form button[type="submit"] {
+  margin-top: 12px;
+  background: #d4af37;
+  color: #05192e;
+}
+
+.admin-dashboard .admin-message {
+  max-width: 1100px;
+  margin: 0 auto 20px;
+  padding: 13px 16px;
+  border-radius: 8px;
+  background: #fff8e1;
+  color: #795b0e;
+  overflow-wrap: anywhere;
+}
+
+.admin-dashboard .admin-content {
+  max-width: 1100px;
+  margin: auto;
+}
+
+.admin-dashboard .admin-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.admin-dashboard .admin-stat-card {
+  padding: 24px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: white;
+}
+
+.admin-dashboard .admin-stat-card span,
+.admin-dashboard .admin-stat-card strong {
+  display: block;
+}
+
+.admin-dashboard .admin-stat-card strong {
+  margin-top: 12px;
+  font-size: 28px;
+  color: #a77b20;
+}
+
+.admin-dashboard .admin-section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.admin-dashboard .admin-faq-list {
+  display: grid;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.admin-dashboard .admin-faq-item {
+  padding: 20px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.admin-dashboard .admin-faq-item h3 {
+  margin-bottom: 8px;
+}
+
+.admin-dashboard .admin-faq-item p {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.admin-dashboard .admin-category {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 20px;
+  background: #fff4cf;
+  color: #795b0e;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.admin-dashboard small {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 600px) {
+  .admin-dashboard {
+    padding: 24px 14px;
+  }
+
+  .admin-dashboard h1 {
+    font-size: 27px;
+  }
+
+  .admin-dashboard .admin-panel,
+  .admin-dashboard .admin-login {
+    padding: 22px 18px;
+  }
+
+  .admin-dashboard .admin-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-dashboard .admin-header {
+    align-items: flex-start;
+  }
+}
