@@ -1,10 +1,11 @@
-
 const fs = require("fs");
 const path = require("path");
 const multer = require("multer");
 const pdfParse = require("pdf-parse");
 const mammoth = require("mammoth");
+const mongoose = require("mongoose");
 const Document = require("../models/Document");
+const { memoryStore } = require("../models/mockData");
 
 const uploadDir = path.join(__dirname, "..", "uploads");
 
@@ -12,7 +13,7 @@ if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-// Configure file storage
+// Configure file storage with safe sanitized names
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, uploadDir);
@@ -36,12 +37,13 @@ const upload = multer({
 
   fileFilter: (req, file, cb) => {
     const extension = path.extname(file.originalname).toLowerCase();
+    const allowedExtensions = [".pdf", ".docx"];
 
-    if ([".pdf", ".docx"].includes(extension)) {
-      return cb(null, true);
+    if (!allowedExtensions.includes(extension)) {
+      return cb(new Error("Only PDF and DOCX files are allowed."));
     }
 
-    cb(new Error("Only PDF and DOCX files are allowed."));
+    cb(null, true);
   },
 }).single("document");
 
@@ -87,7 +89,7 @@ async function extractDocumentText(filePath, extension) {
   throw new Error("Unsupported document format.");
 }
 
-// Upload document and save it to MongoDB
+// Upload document, extract text, and save to MongoDB (or demo memory if offline)
 async function uploadDocument(req, res) {
   let uploadedPath;
 
@@ -116,18 +118,43 @@ async function uploadDocument(req, res) {
       });
     }
 
-    // Save document details and extracted text to MongoDB
-    const savedDocument = await Document.create({
-      originalName: req.file.originalname,
-      filename: req.file.filename,
-      category: req.body.category || "General",
-      extractedText: text,
-      uploadedBy: "admin",
-    });
+    const isDbConnected = mongoose.connection.readyState === 1;
+    let savedDocument;
+
+    if (isDbConnected) {
+      savedDocument = await Document.create({
+        originalName: req.file.originalname,
+        filename: req.file.filename,
+        category: req.body.category || "General",
+        extractedText: text,
+        uploadedBy: req.admin?.email || "admin",
+      });
+    } else {
+      savedDocument = {
+        _id: "doc_" + Date.now(),
+        originalName: req.file.originalname,
+        filename: req.file.filename,
+        category: req.body.category || "General",
+        extractedText: text,
+        uploadedBy: req.admin?.email || "admin",
+        createdAt: new Date(),
+      };
+      memoryStore.documents.unshift(savedDocument);
+    }
+
+    // Clean up temporary disk file after text is extracted and stored
+    if (uploadedPath && fs.existsSync(uploadedPath)) {
+      try {
+        fs.unlinkSync(uploadedPath);
+      } catch (e) {}
+    }
 
     return res.status(201).json({
       success: true,
-      message: "Document uploaded and saved successfully.",
+      message: isDbConnected
+        ? "Document uploaded and saved to MongoDB successfully."
+        : "Document processed (demo mode: stored in volatile memory, not persisted to database).",
+      isDemoMode: !isDbConnected,
       document: {
         _id: savedDocument._id,
         originalName: savedDocument.originalName,
@@ -140,7 +167,9 @@ async function uploadDocument(req, res) {
   } catch (error) {
     // Remove the uploaded file if processing or saving fails
     if (uploadedPath && fs.existsSync(uploadedPath)) {
-      fs.unlinkSync(uploadedPath);
+      try {
+        fs.unlinkSync(uploadedPath);
+      } catch (e) {}
     }
 
     console.error("Document processing error:", error.message);

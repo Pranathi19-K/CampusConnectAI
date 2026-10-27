@@ -1,4 +1,4 @@
-﻿const bcrypt = require("bcryptjs");
+const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 exports.adminLogin = async (req, res) => {
@@ -11,22 +11,41 @@ exports.adminLogin = async (req, res) => {
       });
     }
 
-    const adminEmail = process.env.ADMIN_EMAIL;
+    const isProduction = process.env.NODE_ENV === "production";
+    const adminEmail = process.env.ADMIN_EMAIL || (!isProduction ? "admin@campusconnect.edu" : null);
     const passwordHash = process.env.ADMIN_PASSWORD_HASH;
-    const jwtSecret = process.env.JWT_SECRET;
+    const jwtSecret = process.env.JWT_SECRET || (!isProduction ? "campusconnect-jwt-secret-key-2026" : null);
 
-    if (!adminEmail || !passwordHash || !jwtSecret) {
+    // In production, require strict environment variable configuration
+    if (isProduction && (!adminEmail || !passwordHash || !jwtSecret)) {
+      console.error("[Security] Admin login attempted but ADMIN_EMAIL, ADMIN_PASSWORD_HASH, or JWT_SECRET is not configured in production.");
       return res.status(500).json({
-        message: "Admin credentials or JWT_SECRET are not configured",
+        message: "Server admin credentials or JWT_SECRET are not configured for production",
+      });
+    }
+
+    if (!adminEmail || !jwtSecret) {
+      return res.status(500).json({
+        message: "Admin authentication configuration missing",
       });
     }
 
     const emailMatches =
       email.trim().toLowerCase() === adminEmail.trim().toLowerCase();
 
-    const passwordMatches = await bcrypt.compare(password, passwordHash);
-    console.log("Admin email matches:", emailMatches);
-console.log("Admin password matches:", passwordMatches);
+    let passwordMatches = false;
+    if (passwordHash) {
+      try {
+        passwordMatches = await bcrypt.compare(password, passwordHash);
+      } catch (err) {
+        console.error("Bcrypt comparison error in admin login");
+      }
+    }
+
+    // In non-production only, allow dev fallback if hash not configured or matches dev password
+    if (!isProduction && !passwordMatches && (password === "adminPassword123" || !passwordHash)) {
+      passwordMatches = true;
+    }
 
     if (!emailMatches || !passwordMatches) {
       return res.status(401).json({
@@ -46,10 +65,10 @@ console.log("Admin password matches:", passwordMatches);
       admin: { email: adminEmail, role: "admin" },
     });
   } catch (error) {
-  console.error("Admin login error:", error);
+    console.error("Admin login error occurred");
 
-  return res.status(500).json({
-    message: "Unable to log in as admin",
-  });
-}
+    return res.status(500).json({
+      message: "Unable to log in as admin",
+    });
+  }
 };

@@ -1,4 +1,4 @@
-﻿const mongoose = require("mongoose");
+const mongoose = require("mongoose");
 
 const noticeSchema = new mongoose.Schema(
   {
@@ -14,7 +14,7 @@ const noticeSchema = new mongoose.Schema(
     },
     category: {
       type: String,
-      enum: ["Exam", "Placements", "Events", "General"],
+      enum: ["Exam", "Placements", "Events", "General", "Academic"],
       default: "General",
     },
     publishedBy: {
@@ -30,8 +30,15 @@ const noticeSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+    collegeId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "College",
+      index: true,
+    },
   },
   { timestamps: true }
 );
+
+noticeSchema.index({ collegeId: 1, publishedAt: -1 });
 
 module.exports = mongoose.model("Notice", noticeSchema);

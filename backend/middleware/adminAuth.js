@@ -1,4 +1,4 @@
-﻿const jwt = require("jsonwebtoken");
+const jwt = require("jsonwebtoken");
 
 module.exports = (req, res, next) => {
   try {
@@ -11,7 +11,17 @@ module.exports = (req, res, next) => {
     }
 
     const token = authHeader.split(" ")[1];
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const isProduction = process.env.NODE_ENV === "production";
+    const secret = process.env.JWT_SECRET || (!isProduction ? "campusconnect-jwt-secret-key-2026" : null);
+
+    if (!secret) {
+      console.error("[Security] JWT_SECRET is not configured for production verification.");
+      return res.status(500).json({
+        message: "Server authentication configuration missing",
+      });
+    }
+
+    const decoded = jwt.verify(token, secret);
 
     if (decoded.role !== "admin") {
       return res.status(403).json({

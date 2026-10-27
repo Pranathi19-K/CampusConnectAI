@@ -1,4 +1,4 @@
-﻿const mongoose = require("mongoose");
+const mongoose = require("mongoose");
 
 const faqSchema = new mongoose.Schema(
   {
@@ -32,8 +32,15 @@ const faqSchema = new mongoose.Schema(
       type: String,
       default: "Admin",
     },
+    collegeId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "College",
+      index: true,
+    },
   },
   { timestamps: true }
 );
+
+faqSchema.index({ collegeId: 1, category: 1 });
 
 module.exports = mongoose.model("FAQ", faqSchema);

@@ -1,4 +1,3 @@
-
 const mongoose = require("mongoose");
 
 const documentSchema = new mongoose.Schema(
@@ -25,6 +24,11 @@ const documentSchema = new mongoose.Schema(
       type: String,
       default: "admin",
     },
+    collegeId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "College",
+      index: true,
+    },
   },
   {
     timestamps: true,
@@ -32,4 +36,3 @@ const documentSchema = new mongoose.Schema(
 );
 
 module.exports = mongoose.model("Document", documentSchema);
-
